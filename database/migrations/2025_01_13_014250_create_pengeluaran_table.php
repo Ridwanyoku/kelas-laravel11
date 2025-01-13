@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pembayaran_kas', function (Blueprint $table) {
+        Schema::create('pengeluaran', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('siswa_id')->constrained('siswa')->onDelete('cascade');
-            $table->string('bulan');
-            $table->integer('tahun');
-            $table->integer('checklist')->default(0);
+            $table->string('deskripsi'); // Penjelasan pengeluaran
+            $table->integer('jumlah'); // Jumlah uang yang dikeluarkan
+            $table->date('tanggal'); // Tanggal pengeluaran
             $table->timestamps();
         });
+        
     }
 
     /**
@@ -26,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pembayaran_siswa');
+        Schema::dropIfExists('pengeluaran');
     }
 };
