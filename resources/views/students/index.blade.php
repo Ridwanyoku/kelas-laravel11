@@ -51,7 +51,7 @@
         <button type="button" id="delete-year">- Hapus Tahun</button> --}}
         
     
-        {{-- <button type="submit">Pilih</button> --}}
+        <button type="submit">Pilih</button>
 
         
     </form>    
