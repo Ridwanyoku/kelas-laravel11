@@ -11,14 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('pengeluaran', function (Blueprint $table) {
+        Schema::create('students', function (Blueprint $table) {
             $table->id();
-            $table->string('deskripsi'); // Penjelasan pengeluaran
-            $table->integer('jumlah'); // Jumlah uang yang dikeluarkan
-            $table->date('tanggal'); // Tanggal pengeluaran
+            $table->string('name'); // Nama siswa
+            $table->date('registration_date'); // Tanggal pendaftaran
             $table->timestamps();
         });
-        
     }
 
     /**
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('pengeluaran');
+        Schema::dropIfExists('students');
     }
 };

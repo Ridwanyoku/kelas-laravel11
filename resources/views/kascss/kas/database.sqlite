@@ -1,0 +1,27 @@
+-- Buat tabel kas untuk mencatat transaksi
+CREATE TABLE IF NOT EXISTS kas (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    tanggal TEXT NOT NULL,
+    jumlah INTEGER NOT NULL,
+    keterangan TEXT NOT NULL
+);
+
+-- Isi data awal kas
+INSERT INTO kas (tanggal, jumlah, keterangan) VALUES
+('2025-01-01', 500000, 'Setoran awal kelas'),
+('2025-01-03', -200000, 'Pembelian alat tulis'),
+('2025-01-05', -150000, 'Biaya kebersihan');
+
+-- Buat tabel pembayaran untuk mencatat status pembayaran siswa
+CREATE TABLE IF NOT EXISTS pembayaran (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nama_siswa TEXT NOT NULL,
+    status TEXT NOT NULL,
+    jumlah INTEGER NOT NULL
+);
+
+-- Isi data awal pembayaran
+INSERT INTO pembayaran (nama_siswa, status, jumlah) VALUES
+('Andi', 'Lunas', 50000),
+('Budi', 'Lunas', 50000),
+('Citra', 'Belum Lunas', 0);
