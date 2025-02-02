@@ -9,9 +9,7 @@ class StudentChecklist extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'student_id', 'month', 'year', 'check1', 'check2', 'check3', 'check4', 'total_cash',
-    ];
+    protected $fillable = ['student_id', 'month', 'year', 'cash_amount'];
 
     public function student()
     {

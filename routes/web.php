@@ -28,5 +28,7 @@ Route::middleware(['auth.single'])->group(function () {
 
     Route::post('/reset-total-cash', [ChecklistController::class, 'resetTotalCash'])->name('reset.totalCash');
 
+    Route::post('/students/{student}/update-cash', [StudentController::class, 'updateCash'])->name('students.updateCash');
+
     
 });

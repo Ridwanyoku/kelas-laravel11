@@ -12,7 +12,7 @@ class DatabaseSeeder extends Seeder
 
     public function run()
     {
-        $years = [2023, 2024, 2025];
+        $years = [2025];
 
         foreach ($years as $year) {
             Year::firstOrCreate(['year' => $year]);

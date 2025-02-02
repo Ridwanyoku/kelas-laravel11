@@ -16,19 +16,30 @@ class StudentController extends Controller
     {
         $month = $request->input('month', date('m'));
         $year = $request->input('year', date('Y'));
-    
-        // Ambil daftar tahun dari database
-        $years = Year::orderBy('year', 'asc')->pluck('year');
-    
+
         $students = Student::with(['checklists' => function ($query) use ($month, $year) {
             $query->where('month', $month)->where('year', $year);
         }])->get();
-    
+
+        // Ambil daftar tahun yang tersedia dari tabel student_checklists
+        $years = StudentChecklist::select('year')->distinct()->orderBy('year', 'desc')->pluck('year');
+
+        // Hitung total kas per siswa sepanjang tahun yang dipilih
+        $students->each(function ($student) use ($year) {
+            $student->total_cash_per_year = $student->checklists()->where('year', $year)->sum('cash_amount');
+        });
+
+        // Hitung total kas per bulan yang dipilih
+        $totalCashPerMonth = StudentChecklist::where('month', $month)
+            ->where('year', $year)
+            ->sum('cash_amount');
+
         // Hitung total kas sepanjang waktu
-        $totalCashAllTime = StudentChecklist::sum('total_cash');
-    
-        return view('students.index', compact('students', 'month', 'year', 'years', 'totalCashAllTime'));    
+        $totalCashAllTime = StudentChecklist::sum('cash_amount');
+
+        return view('students.index', compact('students', 'month', 'year', 'years', 'totalCashPerMonth', 'totalCashAllTime'));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -95,25 +106,31 @@ class StudentController extends Controller
         return redirect()->route('students.index')->with('success', 'Student deleted successfully!');
     }
 
-    public function updateChecklist(Request $request)
+    public function updateCash(Request $request, $studentId)
     {
-        $studentId = $request->input('student_id');
-        $check = $request->input('check');
-        $month = $request->input('month');
-        $year = $request->input('year');
+        $request->validate([
+            'cash_amount' => 'required|numeric|min:0'
+        ]);
 
-        $checklist = StudentChecklist::firstOrCreate(
-            ['student_id' => $studentId, 'month' => $month, 'year' => $year],
-            ['total_cash' => 0]
+        $month = $request->input('month', date('m'));
+        $year = $request->input('year', date('Y'));
+
+        // Simpan atau perbarui kas siswa berdasarkan bulan & tahun
+        StudentChecklist::updateOrCreate(
+            [
+                'student_id' => $studentId,
+                'month' => $month,
+                'year' => $year,
+            ],
+            [
+                'cash_amount' => $request->input('cash_amount'),
+            ]
         );
 
-        $field = 'check' . $check;
-        $checklist->$field = !$checklist->$field; // Toggle checkbox
-        $checklist->total_cash = ($checklist->check1 + $checklist->check2 + $checklist->check3 + $checklist->check4) * 5000;
-        $checklist->save();
-
-        return response()->json(['success' => true, 'total_cash' => $checklist->total_cash]);
+        return redirect()->route('students.index', ['month' => $month, 'year' => $year])
+                     ->with('success', 'Kas berhasil diperbarui!');
     }
+
 
 
 }

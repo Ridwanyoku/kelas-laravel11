@@ -16,7 +16,11 @@
     <a href="{{ route('students.create') }}" style="display: inline-block; margin-bottom: 20px; padding: 10px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Tambah Siswa</a>
 
     <div style="margin-top: 20px; font-weight: bold; font-size: 18px;">
-        Total Kas Sepanjang Waktu: Rp {{ number_format($totalCashAllTime, 0, ',', '.') }}
+        <div>
+            <h3>Total Kas Bulan Ini: Rp {{ number_format($totalCashPerMonth, 0, ',', '.') }}</h3>
+            <h3>Total Kas Sepanjang Waktu: Rp {{ number_format($totalCashAllTime, 0, ',', '.') }}</h3>
+        </div>
+        
     </div>
     
     
@@ -29,7 +33,7 @@
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-lg font-medium text-gray-900">Riwayat Pembayaran</h2>
 
-                <button class="!rounded-button bg-green-600 text-white px-4 py-2 hover:bg-green-700"
+                <button class="rounded-button bg-green-600 text-white px-4 py-2 hover:bg-green-700"
                     onclick="exportTableToExcel('pembayaran-table', 'kas_kelas_pembayaran')">
                     <i class="fas fa-file-excel mr-2"></i>Export Excel
                 </button>
@@ -63,14 +67,14 @@
                 </div>
                 
                 <div class="flex gap-4">
-                    <select class="rounded-md border-gray-300 shadow-sm focus:border-custom focus:ring-custom">
+                    {{-- <select class="rounded-md border-gray-300 shadow-sm focus:border-custom focus:ring-custom">
                         <option>Semua Status</option>
                         <option>Lunas</option>
                         <option>Belum Lunas</option>
-                    </select>
-                    <form method="GET" action="{{ route('students.index') }}" style="margin-bottom: 20px;">
+                    </select> --}}
+                    <form method="GET" action="{{ route('students.index') }}">
                         <label for="month">Bulan:</label>
-                        <select id="month" name="month" required>
+                        <select class="rounded-md border-gray-300 shadow-sm focus:border-custom focus:ring-custom" id="month" name="month" required>
                             @for ($i = 1; $i <= 12; $i++)
                                 <option value="{{ $i }}" {{ request('month') == $i ? 'selected' : '' }}>
                                     {{ date('F', mktime(0, 0, 0, $i, 1)) }}
@@ -78,10 +82,12 @@
                             @endfor
                         </select>
                     
-                        <label for="year">Tahun:</label>
-                        <select id="year" name="year" required>
-                            @foreach ($years as $year)
-                                <option value="{{ $year }}" {{ request('year') == $year ? 'selected' : '' }}>{{ $year }}</option>
+                        <label for="year">Pilih Tahun:</label>
+                        <select class="rounded-md border-gray-300 shadow-sm focus:border-custom focus:ring-custom" name="year" id="year" onchange="this.form.submit()">
+                            @foreach ($years as $availableYear)
+                                <option value="{{ $availableYear }}" {{ $year == $availableYear ? 'selected' : '' }}>
+                                    {{ $availableYear }}
+                                </option>
                             @endforeach
                         </select>
                 
@@ -104,12 +110,40 @@
                         <button type="button" id="delete-year">- Hapus Tahun</button> --}}
                         
                     
-                        <button class="!rounded-button bg-blue-600 text-white px-4 py-2 hover:bg-green-700" type="submit">Pilih</button>
+                        <button class="rounded-button bg-blue-600 text-white px-4 py-2 hover:bg-green-700" type="submit">Pilih</button>
                     </form>
                 </div>
             </div>
             <div class="overflow-x-auto">
-                <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nama</th>
+                            <th>Kas (Rp)</th>
+                            <th>Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($students as $student)
+                        <tr>
+                            <td>{{ $student->name }}</td>
+                            <td>
+                                <form method="POST" action="{{ route('students.updateCash', $student->id) }}">
+                                    @csrf
+                                    <input type="number" name="cash_amount" value="{{ $student->checklists->first()->cash_amount ?? 0 }}" required>
+                                    <input type="hidden" name="month" value="{{ $month }}">
+                                    <input type="hidden" name="year" value="{{ $year }}">
+                                    <button type="submit">Simpan</button>
+                                </form>
+                            </td>
+                            <td>{{ number_format($student->total_cash_per_year, 0, ',', '.') }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+                
+                
+                {{-- <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse;">
                     <thead>
                         <tr>
                             <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
@@ -119,7 +153,7 @@
                             <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Checklist 2</th>
                             <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Checklist 3</th>
                             <th class="px-6 py-3 bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Checklist 4</th>
-                            {{-- <th>Aksi</th> --}}
+                            <th>Aksi</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
@@ -146,7 +180,7 @@
                                 <td>
                                     <input type="checkbox" class="checklist h-5 w-5 rounded border-gray-300 text-custom focus:ring-custom" data-student-id="{{ $student->id }}" data-check="4" {{ $checklist && $checklist->check4 ? 'checked' : '' }}>
                                 </td>
-                                {{-- <td>
+                                <td>
                                     <!-- Tombol Edit -->
                                     <a href="{{ route('students.edit', $student) }}" style="margin-right: 10px; color: blue;">Edit</a>
             
@@ -156,7 +190,7 @@
                                         @method('DELETE')
                                         <button type="submit" style="color: red; background: none; border: none; cursor: pointer;">Hapus</button>
                                     </form>
-                                </td> --}}
+                                </td>
                             </tr>
                         @empty
                             <tr>
@@ -164,7 +198,7 @@
                             </tr>
                         @endforelse
                     </tbody>
-                </table>
+                </table> --}}
 
                 {{-- <table class="min-w-full divide-y divide-gray-200 table-auto" id="pembayaran-table">
                     <thead>
@@ -223,62 +257,7 @@
         </div>
     </div>
 </main>
-    {{-- <table border="1" cellpadding="10" cellspacing="0" style="width: 100%; border-collapse: collapse;">
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Nama</th>
-                <th>Checklist 1</th>
-                <th>Checklist 2</th>
-                <th>Checklist 3</th>
-                <th>Checklist 4</th>
-                <th>Total Kas</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-            @forelse($students as $index => $student)
-                @php
-                    $checklist = $student->checklists()
-                        ->where('month', request('month', date('m')))
-                        ->where('year', request('year', date('Y')))
-                        ->first();
-                @endphp
-                <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>{{ $student->name }}</td>
-                    <td>
-                        <input type="checkbox" class="checklist" data-student-id="{{ $student->id }}" data-check="1" {{ $checklist && $checklist->check1 ? 'checked' : '' }}>
-                    </td>
-                    <td>
-                        <input type="checkbox" class="checklist" data-student-id="{{ $student->id }}" data-check="2" {{ $checklist && $checklist->check2 ? 'checked' : '' }}>
-                    </td>
-                    <td>
-                        <input type="checkbox" class="checklist" data-student-id="{{ $student->id }}" data-check="3" {{ $checklist && $checklist->check3 ? 'checked' : '' }}>
-                    </td>
-                    <td>
-                        <input type="checkbox" class="checklist" data-student-id="{{ $student->id }}" data-check="4" {{ $checklist && $checklist->check4 ? 'checked' : '' }}>
-                    </td>
-                    <td>{{ $checklist->total_cash ?? 0 }}</td>
-                    <td>
-                        <!-- Tombol Edit -->
-                        <a href="{{ route('students.edit', $student) }}" style="margin-right: 10px; color: blue;">Edit</a>
 
-                        <!-- Tombol Hapus -->
-                        <form action="{{ route('students.destroy', $student) }}" method="POST" style="display: inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" style="color: red; background: none; border: none; cursor: pointer;">Hapus</button>
-                        </form>
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="7" style="text-align: center;">Belum ada siswa yang ditambahkan.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table> --}}
     
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
