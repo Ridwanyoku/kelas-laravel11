@@ -1,33 +1,52 @@
 @extends('layout')
 
 @section('content')
-    <h1>Daftar Siswa</h1>
+    {{-- <h1 class="!rounded-button bg-green-600 text-white px-4 py-2 hover:bg-green-700">Daftar Siswa</h1> --}}
 
-    <nav class="navbar navbar-light bg-light">
+    {{-- <nav class="navbar navbar-light bg-light">
         <a class="navbar-brand" href="#">Keuangan Kelas</a>
-        <form action="{{ route('logout') }}" method="POST">
-            @csrf
-            <button type="submit" class="btn btn-outline-danger">Logout</button>
-        </form>
-    </nav>
-    
-
-    <!-- Tombol Tambah Siswa -->
-    <a href="{{ route('students.create') }}" style="display: inline-block; margin-bottom: 20px; padding: 10px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Tambah Siswa</a>
-
-    <div style="margin-top: 20px; font-weight: bold; font-size: 18px;">
-        <div>
-            <h3>Total Kas Bulan Ini: Rp {{ number_format($totalCashPerMonth, 0, ',', '.') }}</h3>
-            <h3>Total Kas Sepanjang Waktu: Rp {{ number_format($totalCashAllTime, 0, ',', '.') }}</h3>
-        </div>
-        
-    </div>
-    
+       
+    </nav> --}}
     
 
 
+
+    
+    
+    
+    
     <!-- Tabel Daftar Siswa -->
-<main class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="max-w-8xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-4 mb-8">
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-wallet text-2xl text-custom"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Kas Bulan ini</h3>
+                        <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ number_format($totalCashPerMonth, 0, ',', '.') }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-wallet text-2xl text-custom"></i>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Kas</h3>
+                        <p class="text-2xl font-semibold text-gray-900 dark:text-white">{{ number_format($totalCashAllTime, 0, ',', '.') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {{-- <div style="margin-top: 20px; font-weight: bold; font-size: 18px;">
+        <div>
+            <h3 class="text-lg font-medium text-gray-900">Total Kas Bulan Ini: Rp {{ number_format($totalCashPerMonth, 0, ',', '.') }}</h3>
+            <h3 class="text-lg font-medium text-gray-900">Total Kas Sepanjang Waktu: Rp {{ number_format($totalCashAllTime, 0, ',', '.') }}</h3>
+        </div>
+    </div> --}}
     <div class="mt-8 bg-white rounded-lg shadow">
         <div class="p-6">
             <div class="flex justify-between items-center mb-4">
@@ -43,7 +62,7 @@
                     <input type="text" placeholder="Cari nama siswa..."
                         class="w-full rounded-md border-gray-300 shadow-sm focus:border-custom focus:ring-custom" />
                 </div>
-                <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+                {{-- <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                     <div class="flex items-center">
                         <div class="flex-shrink-0">
                             <i class="fas fa-check-circle text-2xl text-green-500"></i>
@@ -64,7 +83,7 @@
                             <p class="text-2xl font-semibold text-gray-900 dark:text-white">4 Siswa</p>
                         </div>
                     </div>
-                </div>
+                </div> --}}
                 
                 <div class="flex gap-4">
                     {{-- <select class="rounded-md border-gray-300 shadow-sm focus:border-custom focus:ring-custom">
@@ -72,7 +91,7 @@
                         <option>Lunas</option>
                         <option>Belum Lunas</option>
                     </select> --}}
-                    <form method="GET" action="{{ route('students.index') }}">
+                    <form class="" method="GET" action="{{ route('students.index') }}">
                         <label for="month">Bulan:</label>
                         <select class="rounded-md border-gray-300 shadow-sm focus:border-custom focus:ring-custom" id="month" name="month" required>
                             @for ($i = 1; $i <= 12; $i++)
@@ -119,7 +138,7 @@
                     <thead>
                         <tr>
                             <th>Nama</th>
-                            <th>Kas (Rp)</th>
+                            <th>Kas bulan ini</th>
                             <th>Total</th>
                         </tr>
                     </thead>
@@ -133,7 +152,7 @@
                                     <input type="number" name="cash_amount" value="{{ $student->checklists->first()->cash_amount ?? 0 }}" required>
                                     <input type="hidden" name="month" value="{{ $month }}">
                                     <input type="hidden" name="year" value="{{ $year }}">
-                                    <button type="submit">Simpan</button>
+                                    <button class="btn rounded-lg bg-green-600 text-white px-4 py-2 hover:bg-green-700" type="submit">Simpan</button>
                                 </form>
                             </td>
                             <td>{{ number_format($student->total_cash_per_year, 0, ',', '.') }}</td>

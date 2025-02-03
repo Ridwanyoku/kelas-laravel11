@@ -5,6 +5,7 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\ChecklistController;
 use App\Http\Controllers\YearController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\ExpenseController;
 
 // Rute login
 Route::get('/auth/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -29,6 +30,9 @@ Route::middleware(['auth.single'])->group(function () {
     Route::post('/reset-total-cash', [ChecklistController::class, 'resetTotalCash'])->name('reset.totalCash');
 
     Route::post('/students/{student}/update-cash', [StudentController::class, 'updateCash'])->name('students.updateCash');
+
+    Route::get('/expenses', [ExpenseController::class, 'index'])->name('expenses.index');
+    Route::post('/expenses', [ExpenseController::class, 'store'])->name('expenses.store'); 
 
     
 });
